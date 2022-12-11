@@ -12,17 +12,11 @@ def get_restaurant_data(db_filename):
         INNER JOIN categories c ON r.category_id = c.id
         INNER JOIN buildings b ON r.building_id = b.id
     ''')
-
     data = [{'name': row[0], 'category': row[1], 'building': row[2], 'rating': row[3]} for row in cursor.fetchall()]
     conn.close()
     return data
 
-    
-    
-
-
 def barchart_restaurant_categories(db_filename):
-
     conn = sqlite3.connect(db_filename)
     cursor = conn.cursor()
     cursor.execute('''
@@ -31,11 +25,9 @@ def barchart_restaurant_categories(db_filename):
         INNER JOIN categories c ON r.category_id = c.id
         GROUP BY c.category
     ''')
-
     data = {row[0]: row[1] for row in cursor.fetchall()}
     sorted_data = sorted(data.items(), key=lambda item: item[1], reverse=False)
     conn.close()
-   
     plt.barh(*zip(*sorted_data))
     plt.xlabel('Count')
     plt.ylabel('Category')
@@ -45,44 +37,27 @@ def barchart_restaurant_categories(db_filename):
 
 def highest_rated_category(db_filename):
     data = get_restaurant_data(db_filename)
-    
-    # Create a dictionary to store the average rating for each category
     category_ratings = {}
     for restaurant in data:
         if restaurant['category'] not in category_ratings:
             category_ratings[restaurant['category']] = []
         category_ratings[restaurant['category']].append(restaurant['rating'])
-
-    # Find the average rating for each category
     for category, ratings in category_ratings.items():
         category_ratings[category] = sum(ratings) / len(ratings)
-
-    # Find the category with the highest average rating
     highest_rated_category = None
     highest_rating = 0
     for category, rating in category_ratings.items():
         if rating > highest_rating:
             highest_rated_category = category
             highest_rating = rating
-
-
-
     sorted_data = sorted([(category, round(rating, 1)) for category, rating in category_ratings.items()], key=lambda item: item[1], reverse=False)
-    
-   
     plt.barh(*zip(*sorted_data))
-    
-    # Add axis labels and a chart title
     plt.xlabel('Average Rating')
     plt.ylabel('Category')
     plt.title('Average Rating by Category')
-    
-    # Show the chart
     plt.show()
-    
     return highest_rated_category, highest_rating
 
-#Try calling your functions here
 def main():
     pass
 
