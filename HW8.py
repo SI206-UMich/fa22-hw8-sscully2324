@@ -4,12 +4,22 @@ import sqlite3
 import unittest
 
 def get_restaurant_data(db_filename):
-    """
-    This function accepts the file name of a database as a parameter and returns a list of
-    dictionaries. The key:value pairs should be the name, category, building, and rating
-    of each restaurant in the database.
-    """
-    pass
+    conn = sqlite3.connect(db_filename)
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT r.name, c.category, b.building, r.rating
+        FROM restaurants r
+        INNER JOIN categories c ON r.category_id = c.id
+        INNER JOIN buildings b ON r.building_id = b.id
+    ''')
+
+    data = [{'name': row[0], 'category': row[1], 'building': row[2], 'rating': row[3]} for row in cursor.fetchall()]
+    conn.close()
+    return data
+
+    
+    
+
 
 def barchart_restaurant_categories(db_filename):
     """
