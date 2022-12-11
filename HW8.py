@@ -22,12 +22,24 @@ def get_restaurant_data(db_filename):
 
 
 def barchart_restaurant_categories(db_filename):
-    """
-    This function accepts a file name of a database as a parameter and returns a dictionary. The keys should be the
-    restaurant categories and the values should be the number of restaurants in each category. The function should
-    also create a bar chart with restaurant categories and the counts of each category.
-    """
-    pass
+
+    conn = sqlite3.connect(db_filename)
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT c.category, COUNT(r.id)
+        FROM restaurants r
+        INNER JOIN categories c ON r.category_id = c.id
+        GROUP BY c.category
+    ''')
+
+    data = {row[0]: row[1] for row in cursor.fetchall()}
+    conn.close()
+    plt.bar(data.keys(), data.values())
+    plt.xlabel('Category')
+    plt.ylabel('Count')
+    plt.title('Number of Restaurants by Category')
+    plt.show()
+    return data
 
 #EXTRA CREDIT
 def highest_rated_category(db_filename):#Do this through DB as well
