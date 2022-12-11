@@ -35,6 +35,7 @@ def barchart_restaurant_categories(db_filename):
     data = {row[0]: row[1] for row in cursor.fetchall()}
     conn.close()
     plt.bar(data.keys(), data.values())
+    plt.xticks(rotation=90)
     plt.xlabel('Category')
     plt.ylabel('Count')
     plt.title('Number of Restaurants by Category')
