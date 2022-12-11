@@ -33,24 +33,54 @@ def barchart_restaurant_categories(db_filename):
     ''')
 
     data = {row[0]: row[1] for row in cursor.fetchall()}
+    sorted_data = sorted(data.items(), key=lambda item: item[1], reverse=False)
     conn.close()
-    plt.bar(data.keys(), data.values())
-    plt.xticks(rotation=90)
-    plt.xlabel('Category')
-    plt.ylabel('Count')
+   
+    plt.barh(*zip(*sorted_data))
+    plt.xlabel('Count')
+    plt.ylabel('Category')
     plt.title('Number of Restaurants by Category')
     plt.show()
     return data
 
-#EXTRA CREDIT
-def highest_rated_category(db_filename):#Do this through DB as well
-    """
-    This function finds the average restaurant rating for each category and returns a tuple containing the
-    category name of the highest rated restaurants and the average rating of the restaurants
-    in that category. This function should also create a bar chart that displays the categories along the y-axis
-    and their ratings along the x-axis in descending order (by rating).
-    """
-    pass
+def highest_rated_category(db_filename):
+    data = get_restaurant_data(db_filename)
+    
+    # Create a dictionary to store the average rating for each category
+    category_ratings = {}
+    for restaurant in data:
+        if restaurant['category'] not in category_ratings:
+            category_ratings[restaurant['category']] = []
+        category_ratings[restaurant['category']].append(restaurant['rating'])
+
+    # Find the average rating for each category
+    for category, ratings in category_ratings.items():
+        category_ratings[category] = sum(ratings) / len(ratings)
+
+    # Find the category with the highest average rating
+    highest_rated_category = None
+    highest_rating = 0
+    for category, rating in category_ratings.items():
+        if rating > highest_rating:
+            highest_rated_category = category
+            highest_rating = rating
+
+
+
+    sorted_data = sorted([(category, round(rating, 1)) for category, rating in category_ratings.items()], key=lambda item: item[1], reverse=False)
+    
+   
+    plt.barh(*zip(*sorted_data))
+    
+    # Add axis labels and a chart title
+    plt.xlabel('Average Rating')
+    plt.ylabel('Category')
+    plt.title('Average Rating by Category')
+    
+    # Show the chart
+    plt.show()
+    
+    return highest_rated_category, highest_rating
 
 #Try calling your functions here
 def main():
